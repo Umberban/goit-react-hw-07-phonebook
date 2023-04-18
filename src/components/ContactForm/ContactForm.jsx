@@ -1,6 +1,5 @@
 import css from './ContactForm.module.css'
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useSelector } from "react-redux";
 import { addContact } from 'redux/contactSlice';
@@ -72,6 +71,3 @@ return(
 )
 
 }
-ContactForm.propTypes = {
-  addContact: PropTypes.func,
-};
