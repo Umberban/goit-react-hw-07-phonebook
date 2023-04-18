@@ -1,5 +1,4 @@
 import css from './Filter.module.css'
-import PropTypes from 'prop-types';
 import { useDispatch} from 'react-redux';
 import { filterContacts } from 'redux/filterSlice';
 
@@ -26,7 +25,3 @@ title="Name may contain only letters, apostrophe, dash and spaces. For example A
 />
 </>)
 }
-Filter.propTypes = {
-    handleChange: PropTypes.func,
-    filter: PropTypes.string
-  };

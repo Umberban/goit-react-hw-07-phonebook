@@ -1,31 +1,31 @@
-import css from './ContactForm.module.css'
-import { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useSelector } from "react-redux";
-import { addContact } from 'redux/contactSlice';
-import {getContacts} from 'redux/selector'
+import { addContact } from 'redux/api';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getContacts } from 'redux/selector';
+import css from './ContactForm.module.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export const ContactForm =()=> {
   
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
 
   const dispatch = useDispatch();
   const contacts = useSelector(getContacts);
 
  const handlerSumbit = e =>{
     e.preventDefault();
-    // console.log(contacts[0].name=== name);
+
     setName(e.target.name.value);
-    setNumber(e.target.number.value)
+    setPhone(e.target.number.value)
     if (contacts.some(item => item.name === name)) {
-      alert( "This contact already exists" );
+      toast.info( "This contact already exists" );
       return;
     }
-
-
-
-    dispatch(addContact(name,number));
-    setNumber('')
+    dispatch(addContact({name, phone}));
+    setPhone('')
     setName('')
   }
  const handleChange = evt => {
@@ -33,7 +33,7 @@ export const ContactForm =()=> {
       setName(evt.target.value)
      }
     else if(evt.target.name==='number'){
-      setNumber(evt.target.value)
+      setPhone(evt.target.value)
     }
   };
 
@@ -61,7 +61,7 @@ return(
   type="tel"
   id="number"
   name="number"
-  value={number}
+  value={phone}
   pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
   title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
   required

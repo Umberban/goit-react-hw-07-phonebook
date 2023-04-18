@@ -1,26 +1,61 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { fetchContacts, addContact, deleteContact } from './api';
 
-const initialState = { contactsItem: [] };
+const extraActions = [fetchContacts, addContact, deleteContact];
+
+const getActionsWithType = type =>
+  extraActions.map(extraActions => extraActions[type]);
+
+const fetchContactsSuccessReducer = (state, action) => {
+  state.items = action.payload;
+};
+
+const addContactSuccessReducer = (state, action) => {
+  state.items.push(action.payload);
+};
+
+const deleteContactSuccessReducer = (state, action) => {
+  const index = state.items.findIndex(
+    contact => contact.id === action.payload.id
+  );
+  state.items.splice(index, 1);
+};
+
+const anySuccessReducer = state => {
+  state.isLoading = false;
+  state.error = null;
+};
+
+const anyPendingReducer = state => {
+  state.isLoading = true;
+};
+
+const anyRejectedReducer = (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload;
+};
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: initialState,
-  reducers: {
-    addContact: {
-      reducer(state, action) {
-        state.contactsItem.push(action.payload);
-      },
-      prepare(name, number) {
-        return {
-          payload: { name, number, id: nanoid() },
-        };
-      },
-    },
-    deleteContact(state, action) {
-      state.contactsItem = state.contactsItem.filter(contact => contact.id !== action.payload);
-    },
+  initialState: {
+    items: [],
+    isLoading: false,
+    error: null,
   },
+  extraReducers: builder =>
+    builder
+      .addCase(fetchContacts.fulfilled, fetchContactsSuccessReducer)
+      .addCase(addContact.fulfilled, addContactSuccessReducer)
+      .addCase(deleteContact.fulfilled, deleteContactSuccessReducer)
+      .addMatcher(
+        isAnyOf(...getActionsWithType('fulfilled')),
+        anySuccessReducer
+      )
+      .addMatcher(isAnyOf(...getActionsWithType('pending')), anyPendingReducer)
+      .addMatcher(
+        isAnyOf(...getActionsWithType('rejected')),
+        anyRejectedReducer
+      ),
 });
 
-export const { addContact, deleteContact } = contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;
